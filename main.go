@@ -13,6 +13,11 @@ import (
 )
 
 func main() {
+	if len(os.Args) == 1 {
+		fmt.Printf("No file specified!  Aborted.")
+		os.Exit(1)
+	}
+
 	// Target file provided by os.Args[1].
 	file, err := ioutil.ReadFile(os.Args[1])
 	if err != nil {
@@ -21,8 +26,10 @@ func main() {
 	}
 
 	// Analyze code language.
-	lexer := lexers.Get(path.Ext(os.Args[1])[1:])
-	if lexer == nil {
+	lexer := lexers.Fallback
+	if len(path.Ext(os.Args[1])) > 0 {
+		lexer = lexers.Get(path.Ext(os.Args[1])[1:])
+	} else {
 		if lexers.Analyse(string(file)) != nil {
 			lexer = lexers.Analyse(string(file))
 		} else {
